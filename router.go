@@ -31,14 +31,15 @@ const (
 // Config defines dimensions of configuration for the router.
 // TODO(pb): provide usable defaults in NewRouter
 type Config struct {
-	Host               string
-	Port               int
-	Password           []byte
-	ConnLimit          int
-	ProtocolMinVersion byte
-	PeerDiscovery      bool
-	TrustedSubnets     []*net.IPNet
-	GossipInterval     *time.Duration
+	Host                        string
+	Port                        int
+	Password                    []byte
+	ConnLimit                   int
+	ProtocolMinVersion          byte
+	PeerDiscovery               bool
+	AutoRemoveUnreachableTarget bool
+	TrustedSubnets              []*net.IPNet
+	GossipInterval              *time.Duration
 }
 
 // Router manages communication between this peer and the rest of the mesh.

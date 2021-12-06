@@ -195,7 +195,21 @@ func (cm *connectionMaker) connectionTerminated(conn Connection, err error) {
 		}
 		delete(cm.connections, conn)
 		if conn.isOutbound() {
-			target := cm.targets[conn.remoteTCPAddress()]
+			var targetAddr = conn.remoteTCPAddress()
+			target := cm.targets[targetAddr]
+			if _, ok := err.(*net.OpError); ok &&
+				cm.ourself.router.AutoRemoveUnreachableTarget {
+				cm.logger.Printf("->[%s] auto delete connection target because of net error", targetAddr)
+				// the key in cm.directPeers may be formated like "ip:0", so we have to iterate it to delete by value
+				for key, addr := range cm.directPeers {
+					if addr.String() == targetAddr {
+						delete(cm.directPeers, key)
+						break
+					}
+				}
+				return true
+			}
+
 			target.state = targetWaiting
 			target.lastError = err
 			_, peerNameCollision := err.(*peerNameCollisionError)
